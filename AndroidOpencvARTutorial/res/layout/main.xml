@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:orientation="horizontal" android:id="@+id/linearlayout_main">
+	<!-- <android.opengl.GLSurfaceView android:id="@+id/GLsurface_view" android:layout_width="fill_parent" 
+		android:layout_height="fill_parent"> </android.opengl.GLSurfaceView> 
+
+
+	<android.zh.wang.previewUtils.PreviewSurface android:id="@+id/surface_camera"
+		android:layout_height="fill_parent" android:layout_width="fill_parent"
+		android:layout_weight="1" />
+	<SurfaceView android:layout_weight="1"
+		android:layout_height="fill_parent" android:layout_width="fill_parent"
+		android:id="@+id/surface_canvas" />
+
+-->
+
+</LinearLayout>
