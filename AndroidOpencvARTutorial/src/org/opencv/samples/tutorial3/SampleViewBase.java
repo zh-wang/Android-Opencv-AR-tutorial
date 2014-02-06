@@ -2,6 +2,8 @@ package org.opencv.samples.tutorial3;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,6 +24,7 @@ public abstract class SampleViewBase extends SurfaceView implements SurfaceHolde
     private byte[]              mFrame;
     private boolean             mThreadRun;
 
+
     public SampleViewBase(Context context) {
         super(context);
         mHolder = getHolder();
@@ -38,7 +41,7 @@ public abstract class SampleViewBase extends SurfaceView implements SurfaceHolde
     }
 
     public void surfaceChanged(SurfaceHolder _holder, int format, int width, int height) {
-        Log.i(TAG, "surfaceCreated");
+        Log.i(TAG, "surfaceChanged");
         if (mCamera != null) {
             Camera.Parameters params = mCamera.getParameters();
             List<Camera.Size> sizes = params.getSupportedPreviewSizes();
@@ -49,6 +52,7 @@ public abstract class SampleViewBase extends SurfaceView implements SurfaceHolde
             {
                 double minDiff = Double.MAX_VALUE;
                 for (Camera.Size size : sizes) {
+                    Log.d(TAG, "size : " + size.width + ", " + size.height);
                     if (Math.abs(size.height - height) < minDiff) {
                         mFrameWidth = size.width;
                         mFrameHeight = size.height;
@@ -57,13 +61,15 @@ public abstract class SampleViewBase extends SurfaceView implements SurfaceHolde
                 }
             }
 
+            Log.d(TAG, "change preview size to : " + mFrameWidth + ", " + mFrameHeight);
+            
+//            mFrameWidth = 1920;
+//            mFrameHeight = 1080;
+            mFrameWidth = 800;
+            mFrameHeight = 480;
+
             params.setPreviewSize(getFrameWidth(), getFrameHeight());
             mCamera.setParameters(params);
-            try {
-				mCamera.setPreviewDisplay(null);
-			} catch (IOException e) {
-				Log.e(TAG, "mCamera.setPreviewDisplay fails: " + e);
-			}
             mCamera.startPreview();
         }
     }
@@ -79,6 +85,13 @@ public abstract class SampleViewBase extends SurfaceView implements SurfaceHolde
                 }
             }
         });
+
+        try {
+			mCamera.setPreviewDisplay(holder);
+		} catch (IOException e) {
+			Log.e(TAG, "mCamera.setPreviewDisplay fails: " + e);
+		}
+
         (new Thread(this)).start();
     }
 
@@ -101,11 +114,14 @@ public abstract class SampleViewBase extends SurfaceView implements SurfaceHolde
         mThreadRun = true;
         Log.i(TAG, "Starting processing thread");
         while (mThreadRun) {
+            Log.i(TAG, "thread running");
             Bitmap bmp = null;
 
             synchronized (this) {
                 try {
+                    Log.i(TAG, "thread waiting");
                     this.wait();
+                    Log.i(TAG, "thread resume");
                     bmp = processFrame(mFrame);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -113,6 +129,7 @@ public abstract class SampleViewBase extends SurfaceView implements SurfaceHolde
             }
 
             if (bmp != null) {
+                Log.d(TAG, "bitmap: " + bmp.getWidth() + ", " + bmp.getHeight());
                 Canvas canvas = mHolder.lockCanvas();
                 if (canvas != null) {
                     canvas.drawBitmap(bmp, (canvas.getWidth() - getFrameWidth()) / 2, (canvas.getHeight() - getFrameHeight()) / 2, null);
@@ -120,6 +137,7 @@ public abstract class SampleViewBase extends SurfaceView implements SurfaceHolde
                 }
                 bmp.recycle();
             }
+            
         }
     }
 }

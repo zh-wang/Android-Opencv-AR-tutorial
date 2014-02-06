@@ -98,7 +98,7 @@ class CameraCalibrator{
         LOGI("cameraCalibrator init starts");
 		isCal = isRead = false;
 		successes = 0;
-		boardSize = Size(7, 7);
+		boardSize = Size(8, 6);
 		for (int i = 0; i < boardSize.height; i++) {
 			for (int j = 0; j < boardSize.width; j++) {
 				objectCorners.push_back(
@@ -117,19 +117,34 @@ class CameraCalibrator{
         contoursFindedObjectPoints.push_back(
             Point3f(x, 0, 0.0f));
 
-		MAX_POINT_SIZE = 10;
+		MAX_POINT_SIZE = 2;
 		LOGI("cameraCalibrator init ends");
 	}
 	;
 
 	void addChessboardPoints(Mat image, Mat mgray) {
+		LOGI("add chessboard points");
+
+        LOGI("find feature points");
+        vector<KeyPoint> v;
+
+        FastFeatureDetector detector(50);
+        detector.detect(mgray, v);
+        for( unsigned int i = 0; i < v.size(); i++ )
+        {
+            const KeyPoint& kp = v[i];
+            circle(image, Point(kp.pt.x, kp.pt.y), 10, Scalar(255,0,0,255));
+        }
+
 		bool found = cv::findChessboardCorners(
 				mgray,
 				boardSize,
 				imageCorners,
 				CV_CALIB_CB_ADAPTIVE_THRESH + CV_CALIB_CB_NORMALIZE_IMAGE
 						+ CV_CALIB_CB_FAST_CHECK);
+//				CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
 		if (found) {
+			LOGI("found");
 			cv::cornerSubPix(
 					mgray,
 					imageCorners,
@@ -357,7 +372,7 @@ class CameraCalibrator{
             FileStorage::READ);
             
         if(!fs.isOpened()){
-            LOGI("file cannot be opened!!!");
+            LOGI("points file cannot be opened!!!");
             setIsRead(false);
             return isRead;
         }
@@ -381,11 +396,13 @@ class CameraCalibrator{
         LOGI("readCameraMatrix starts");
         FileStorage fs;
         fs.open("/sdcard/CameraNativeTest/Points.xml", 
+//        fs.open("/sdcard/CameraNativeTest/CameraMatrix.xml",
             FileStorage::READ);
             
         if(!fs.isOpened()){
-            LOGI("file cannot be opened!!!");
+            LOGI("camera matrix file cannot be opened!!!");
             setIsRead(false);
+//            setIsCal(false);
             return isRead;
         }
         
@@ -394,6 +411,7 @@ class CameraCalibrator{
         
         LOGI("readCameraMatrix ends");
         setIsRead(true);
+//        setIsCal(true);
         return isRead;
     }
     
@@ -524,11 +542,10 @@ JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_Sample3View_FindFeature
     // then skip this part
     LOGI("check for points data");
     
-    
-    
     if(!mCameraCalibrator.getIsRead()){
         mCameraCalibrator.readCameraMatrix();
         if(!mCameraCalibrator.getIsRead()){
+        	LOGI("start camera calibrator");
             if(mCameraCalibrator.getSuccesses() < mCameraCalibrator.MAX_POINT_SIZE){
                 cv::putText(mbgra, "doing" + IntToString(mCameraCalibrator.getSuccesses()), Point(10,100), cv::FONT_HERSHEY_SIMPLEX, 1.2, Scalar(0,0,255,255), 5 );
                 mCameraCalibrator.addChessboardPoints(mbgra, mgray);

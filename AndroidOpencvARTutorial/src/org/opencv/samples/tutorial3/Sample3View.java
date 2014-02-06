@@ -14,6 +14,7 @@ class Sample3View extends SampleViewBase {
 
     @Override
     protected Bitmap processFrame(byte[] data) {
+        Log.d("TAG", "processFrame");
         int frameSize = getFrameWidth() * getFrameHeight();
         int[] rgba = new int[frameSize];
         
