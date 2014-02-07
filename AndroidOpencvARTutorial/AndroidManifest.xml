@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.opencv.samples.tutorial3"
+      package="zh.wang.android.opencv.ar"
       android:versionCode="1"
       android:versionName="1.0">
 
@@ -12,13 +12,13 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application android:label="@string/app_name">
-        <activity android:name="Sample3Native"
+        <activity android:name="OpenCVARActivity"
                   android:label="@string/app_name"
                   android:screenOrientation="landscape"
                   android:configChanges="keyboardHidden|orientation">
         </activity>
         <activity android:name="BitmapProcessing"></activity>
-        <activity android:name="MainScreen" android:label="@string/app_name" 
+        <activity android:name="MainActivity" android:label="@string/app_name" 
         	android:icon="@drawable/icon">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

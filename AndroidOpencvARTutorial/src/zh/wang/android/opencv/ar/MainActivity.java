@@ -1,4 +1,4 @@
-package org.opencv.samples.tutorial3;
+package zh.wang.android.opencv.ar;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,7 +8,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class MainScreen extends Activity {
+public class MainActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -16,9 +16,9 @@ public class MainScreen extends Activity {
 		setContentView(lv);
 		
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-		adapter.add("camera");
-		adapter.add("bitmap");
-		adapter.add("homography");
+		adapter.add("OpenCV AR Sample");
+//		adapter.add("bitmap");
+//		adapter.add("homography");
 		
 		lv.setAdapter(adapter);
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -27,19 +27,19 @@ public class MainScreen extends Activity {
 					long arg3) {
 				if(arg2 == 0){
 					Intent intent = new Intent();
-					intent.setClass(getApplicationContext(), Sample3Native.class);
+					intent.setClass(getApplicationContext(), OpenCVARActivity.class);
 					startActivity(intent);
 				} 
-				if(arg2 == 1){
-					Intent intent = new Intent();
-					intent.setClass(getApplicationContext(), BitmapProcessing.class);
-					startActivity(intent);
-				}
-				if(arg2 == 2){
-					Intent intent = new Intent();
-					intent.setClass(getApplicationContext(), Homography.class);
-					startActivity(intent);
-				}
+//				if(arg2 == 1){
+//					Intent intent = new Intent();
+//					intent.setClass(getApplicationContext(), BitmapProcessing.class);
+//					startActivity(intent);
+//				}
+//				if(arg2 == 2){
+//					Intent intent = new Intent();
+//					intent.setClass(getApplicationContext(), Homography.class);
+//					startActivity(intent);
+//				}
 			}
 		});
 

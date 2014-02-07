@@ -1,15 +1,16 @@
-package org.opencv.samples.tutorial3;
+package zh.wang.android.opencv.ar;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 
-public class Sample3Native extends Activity {
-    private static final String TAG = "Sample::Activity";
+public class OpenCVARActivity extends Activity {
+    private static final String TAG = "OpenCVARActivity";
 
-    public Sample3Native() {
+    public OpenCVARActivity() {
         Log.i(TAG, "Instantiated new " + this.getClass());
+
     }
 
     /** Called when the activity is first created. */
@@ -18,7 +19,7 @@ public class Sample3Native extends Activity {
         Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(new Sample3View(this));
+        setContentView(new OpenCVARView(getApplicationContext()));
     }
 }
 

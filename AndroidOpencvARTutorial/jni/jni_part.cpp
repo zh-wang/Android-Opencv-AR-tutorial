@@ -98,7 +98,7 @@ class CameraCalibrator{
         LOGI("cameraCalibrator init starts");
 		isCal = isRead = false;
 		successes = 0;
-		boardSize = Size(8, 6);
+		boardSize = Size(7, 7);
 		for (int i = 0; i < boardSize.height; i++) {
 			for (int j = 0; j < boardSize.width; j++) {
 				objectCorners.push_back(
@@ -117,7 +117,7 @@ class CameraCalibrator{
         contoursFindedObjectPoints.push_back(
             Point3f(x, 0, 0.0f));
 
-		MAX_POINT_SIZE = 2;
+		MAX_POINT_SIZE = 10;
 		LOGI("cameraCalibrator init ends");
 	}
 	;
@@ -142,7 +142,6 @@ class CameraCalibrator{
 				imageCorners,
 				CV_CALIB_CB_ADAPTIVE_THRESH + CV_CALIB_CB_NORMALIZE_IMAGE
 						+ CV_CALIB_CB_FAST_CHECK);
-//				CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
 		if (found) {
 			LOGI("found");
 			cv::cornerSubPix(
@@ -519,7 +518,7 @@ Cube mCube = Cube();
 
 extern "C" {
     
-JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_Sample3View_FindFeatures(JNIEnv* env, jobject thiz, jint width, jint height, jbyteArray yuv, jintArray bgra)
+JNIEXPORT void JNICALL Java_zh_wang_android_opencv_ar_OpenCVARView_FindFeatures(JNIEnv* env, jobject thiz, jint width, jint height, jbyteArray yuv, jintArray bgra)
 {
     LOGI("jni starts");
     jbyte* _yuv  = env->GetByteArrayElements(yuv, 0);
@@ -547,7 +546,10 @@ JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_Sample3View_FindFeature
         if(!mCameraCalibrator.getIsRead()){
         	LOGI("start camera calibrator");
             if(mCameraCalibrator.getSuccesses() < mCameraCalibrator.MAX_POINT_SIZE){
-                cv::putText(mbgra, "doing" + IntToString(mCameraCalibrator.getSuccesses()), Point(10,100), cv::FONT_HERSHEY_SIMPLEX, 1.2, Scalar(0,0,255,255), 5 );
+            	string calibratingProgress = "Calibrating success " +
+                		IntToString(mCameraCalibrator.getSuccesses()) +
+                				"/" + IntToString(mCameraCalibrator.MAX_POINT_SIZE);
+                cv::putText(mbgra, calibratingProgress, Point(10,100), cv::FONT_HERSHEY_SIMPLEX, 1.2, Scalar(0,0,255,255), 5 );
                 mCameraCalibrator.addChessboardPoints(mbgra, mgray);
             } else {
                 mCameraCalibrator.setIsRead(true);
@@ -572,7 +574,7 @@ JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_Sample3View_FindFeature
 }
 
 
-JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_BitmapProcessing_GetCameraIntrisicParams(JNIEnv* env, jobject thiz)
+JNIEXPORT void JNICALL Java_zh_wang_android_opencv_ar_BitmapProcessing_GetCameraIntrisicParams(JNIEnv* env, jobject thiz)
 {
     Size imageSize;
     for(int i=0;i<mCameraCalibrator.MAX_POINT_SIZE;i++){
@@ -596,7 +598,7 @@ JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_BitmapProcessing_GetCam
 }
 
 
-JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_Homography_doHomography(JNIEnv* env, jobject thiz, jstring filename)
+JNIEXPORT void JNICALL Java_zh_wang_android_opencv_ar_Homography_doHomography(JNIEnv* env, jobject thiz, jstring filename)
 {
     LOGI("load image");
 

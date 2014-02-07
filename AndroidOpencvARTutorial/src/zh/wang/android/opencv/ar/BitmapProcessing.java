@@ -1,4 +1,5 @@
-package org.opencv.samples.tutorial3;
+package zh.wang.android.opencv.ar;
+
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -16,8 +17,7 @@ public class BitmapProcessing extends Activity{
 		tv = (TextView) findViewById(R.id.textView1);
 		String s = null;
 		GetCameraIntrisicParams();
-		
 	}
-	
+
 	private native void GetCameraIntrisicParams();
 }
