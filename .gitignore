@@ -11,6 +11,7 @@
 # generated files
 bin/
 gen/
+obj/
 
 # Package Files #
 *.jar
