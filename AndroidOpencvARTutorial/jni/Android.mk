@@ -17,7 +17,7 @@ OPENCV_CAMERA_MODULES:=off
 
 OPENCV_LIB_TYPE:=STATIC
 
-include ../../../OpenCV-2.4.8-android-sdk/sdk/native/jni/OpenCV.mk
+include ../../OpenCV-2.4.8-android-sdk/sdk/native/jni/OpenCV.mk
 
 LOCAL_MODULE    := native_sample
 LOCAL_SRC_FILES := jni_part.cpp

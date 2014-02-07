@@ -1,3 +1,17 @@
+//    Copyright 2014 Zhenghong Wang
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+
 #include <jni.h>
 #include <android/log.h>
 #include <opencv2/core/core.hpp>
@@ -10,7 +24,7 @@
 #include <iostream>
 #include <string>
 
-#define LOG_TAG "android.zh.wang.CameraNativeTest@jni_part"
+#define LOG_TAG "zh.wang.android.opencv.ar@jni_part"
 #define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 
 using namespace std;
@@ -98,7 +112,7 @@ class CameraCalibrator{
         LOGI("cameraCalibrator init starts");
 		isCal = isRead = false;
 		successes = 0;
-		boardSize = Size(8, 6);
+		boardSize = Size(7, 7);
 		for (int i = 0; i < boardSize.height; i++) {
 			for (int j = 0; j < boardSize.width; j++) {
 				objectCorners.push_back(
@@ -117,7 +131,7 @@ class CameraCalibrator{
         contoursFindedObjectPoints.push_back(
             Point3f(x, 0, 0.0f));
 
-		MAX_POINT_SIZE = 2;
+		MAX_POINT_SIZE = 10;
 		LOGI("cameraCalibrator init ends");
 	}
 	;
@@ -142,7 +156,6 @@ class CameraCalibrator{
 				imageCorners,
 				CV_CALIB_CB_ADAPTIVE_THRESH + CV_CALIB_CB_NORMALIZE_IMAGE
 						+ CV_CALIB_CB_FAST_CHECK);
-//				CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
 		if (found) {
 			LOGI("found");
 			cv::cornerSubPix(
@@ -343,7 +356,7 @@ class CameraCalibrator{
 	
 	void savePoints(){
         LOGI("savePoints starts");
-        FileStorage fs("/sdcard/CameraNativeTest/Points.xml", 
+        FileStorage fs("/sdcard/Android_OpenCV_AR/Points.xml",
             FileStorage::WRITE);
         
         for(int i=0;i<MAX_POINT_SIZE;i++){
@@ -358,7 +371,7 @@ class CameraCalibrator{
     
     void saveCameraMatrix(){
         LOGI("saveCameraMatrix starts");
-        FileStorage fs("/sdcard/CameraNativeTest/Points.xml", 
+        FileStorage fs("/sdcard/Android_OpenCV_AR/Points.xml",
             FileStorage::WRITE);
         fs << "CAMERA_MATRIX" << cameraMatrix;
         fs << "DIST_COEFFS" << distCoeffs;
@@ -368,7 +381,7 @@ class CameraCalibrator{
     bool readPoint(){
         LOGI("readPoints starts");
         FileStorage fs;
-        fs.open("/sdcard/CameraNativeTest/Points.xml", 
+        fs.open("/sdcard/Android_OpenCV_AR/Points.xml",
             FileStorage::READ);
             
         if(!fs.isOpened()){
@@ -395,14 +408,12 @@ class CameraCalibrator{
     bool readCameraMatrix(){
         LOGI("readCameraMatrix starts");
         FileStorage fs;
-        fs.open("/sdcard/CameraNativeTest/Points.xml", 
-//        fs.open("/sdcard/CameraNativeTest/CameraMatrix.xml",
+        fs.open("/sdcard/Android_OpenCV_AR/Points.xml",
             FileStorage::READ);
             
         if(!fs.isOpened()){
             LOGI("camera matrix file cannot be opened!!!");
             setIsRead(false);
-//            setIsCal(false);
             return isRead;
         }
         
@@ -411,7 +422,6 @@ class CameraCalibrator{
         
         LOGI("readCameraMatrix ends");
         setIsRead(true);
-//        setIsCal(true);
         return isRead;
     }
     
@@ -519,7 +529,7 @@ Cube mCube = Cube();
 
 extern "C" {
     
-JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_Sample3View_FindFeatures(JNIEnv* env, jobject thiz, jint width, jint height, jbyteArray yuv, jintArray bgra)
+JNIEXPORT void JNICALL Java_zh_wang_android_opencv_ar_OpenCVARView_FindFeatures(JNIEnv* env, jobject thiz, jint width, jint height, jbyteArray yuv, jintArray bgra)
 {
     LOGI("jni starts");
     jbyte* _yuv  = env->GetByteArrayElements(yuv, 0);
@@ -547,7 +557,10 @@ JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_Sample3View_FindFeature
         if(!mCameraCalibrator.getIsRead()){
         	LOGI("start camera calibrator");
             if(mCameraCalibrator.getSuccesses() < mCameraCalibrator.MAX_POINT_SIZE){
-                cv::putText(mbgra, "doing" + IntToString(mCameraCalibrator.getSuccesses()), Point(10,100), cv::FONT_HERSHEY_SIMPLEX, 1.2, Scalar(0,0,255,255), 5 );
+            	string calibratingProgress = "Calibrating success " +
+                		IntToString(mCameraCalibrator.getSuccesses()) +
+                				"/" + IntToString(mCameraCalibrator.MAX_POINT_SIZE);
+                cv::putText(mbgra, calibratingProgress, Point(10,100), cv::FONT_HERSHEY_SIMPLEX, 1.2, Scalar(0,0,255,255), 5 );
                 mCameraCalibrator.addChessboardPoints(mbgra, mgray);
             } else {
                 mCameraCalibrator.setIsRead(true);
@@ -572,11 +585,11 @@ JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_Sample3View_FindFeature
 }
 
 
-JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_BitmapProcessing_GetCameraIntrisicParams(JNIEnv* env, jobject thiz)
+JNIEXPORT void JNICALL Java_zh_wang_android_opencv_ar_BitmapProcessing_GetCameraIntrisicParams(JNIEnv* env, jobject thiz)
 {
     Size imageSize;
     for(int i=0;i<mCameraCalibrator.MAX_POINT_SIZE;i++){
-        string s = "/sdcard/CameraNativeTest/cb" + IntToString(i) + ".jpg"; 
+        string s = "/sdcard/Android_OpenCV_AR/cb" + IntToString(i) + ".jpg";
         cv::Mat image = cv::imread(s);
         string t = "image: " + s + " is read.";
         cv::resize(image, image, cv::Size(), 0.25, 0.25);
@@ -596,7 +609,7 @@ JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_BitmapProcessing_GetCam
 }
 
 
-JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_Homography_doHomography(JNIEnv* env, jobject thiz, jstring filename)
+JNIEXPORT void JNICALL Java_zh_wang_android_opencv_ar_Homography_doHomography(JNIEnv* env, jobject thiz, jstring filename)
 {
     LOGI("load image");
 
@@ -703,7 +716,7 @@ JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial3_Homography_doHomography
     
     
     LOGI("write image");
-    cv::imwrite("/sdcard/CameraNativeTest/marker_after.png", image);
+    cv::imwrite("/sdcard/Android_OpenCV_AR/marker_after.png", image);
     
     env->ReleaseStringUTFChars(filename, fnameptr); 
 }
